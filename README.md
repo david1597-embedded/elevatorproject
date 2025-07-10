@@ -1,56 +1,50 @@
-# 🔵elevatorproject
+# 🔵 STM32 기반 엘리베이터 프로젝트 (Elevator Control System)
+
+> **프로젝트 링크:** [Velog 블로그 링크](https://velog.io/@david1597/%EC%97%98%EB%A6%AC%EB%B2%A0%EC%9D%B4%ED%84%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-1)
+
+## 📌 프로젝트 개요
+
+이 프로젝트는 **STM32F411RE** 보드를 기반으로 실제 엘리베이터 시스템의 동작을 임베디드 환경에서 구현한 것입니다.  
+내부 요청, 외부 상승/하강 요청을 각각 구분하여 SCAN 알고리즘을 적용, 실제 동작 시간과 인터럽트 기반 요청 처리, UART 로그 기록 등을 통해 **현실적인 시뮬레이션 환경**을 조성했습니다.
+
+---
+
+## 🛠️ 사용 하드웨어 및 시스템 구성
+
+![KakaoTalk_20250710_194846447](https://github.com/user-attachments/assets/102f81c8-7345-4421-a160-4adb7a451bf9)
 
 
-![image](https://github.com/user-attachments/assets/e42e9b53-3697-4fa6-af3d-f6c2dbd50566)
+- **MCU**: STM32F411RE (Nucleo 보드)
+- **모터 제어**
+  - 스테퍼 모터 (IN1: PC8, IN2: PB9, IN3: PB8, IN4: PC0)
+  - 구동 전원: 12V
+  - 타이머: TIM10 (프리스케일러: 99, 카운터 주기: 1914)
+- **입력 장치**
+  - 버튼: PB0 ~ PB6 (외부 인터럽트 EXTI)
+- **층 감지 센서**
+  - 조도 센서: PA10, PA11, PA12
+- **통신**
+  - UART 통신 (HUART)
 
-엘리베이터 구동 관련 코드 게시
+---
 
-## 🔵현재 엘리베이터 하드웨어 구성
+## ⚙️ 시스템 알고리즘 및 동작 흐름
 
-![KakaoTalk_20250710_194846447](https://github.com/user-attachments/assets/8ea75d5b-dbc3-486e-83aa-f756289dd65e)
+엘리베이터는 **SCAN 알고리즘**을 기반으로 하여 요청을 정방향 우선 순서로 처리합니다.  
+내부, 외부 상승, 외부 하강 요청은 각각 큐로 관리되며, **현재 상태(IDLE, UP, DOWN)**와 **현재 층**에 따라 다르게 동작합니다.
 
+요청은 두 단계로 구분됩니다:
+- **동일 층 요청 처리**
+- **다른 층 요청 처리**
 
-- 메인 MCU 
-STM32 F411RE
+`HAL_GetTick()`을 통해 구동 시간을 측정하여 도착 및 정지를 제어합니다.
 
-- 주변 기기 핀 세팅 
+---
 
-    - 스테퍼 모터 스텝 주기 계산용 타이머 
-       사용 타이머 : TIM10
-
-       분주비 : 100 - 1 (시스템 클럭  100MHz)
-
-       카운터 주기 : 1914 - 1
-
-      스텝 계산용 GPIO
-      IN1 : PC8
-      IN2 : PB9
-      IN3 : PB8
-      IN4 : PC0
-
-      스텝 모터 드라이버 입력 전원
-      12V
-
-    - 버튼
-        외부인터럽트 PB0 ~ PB6
-
-    - 층 감지용 조도센서
-        PA10, PA11, PA12
-
-## 엘리베이터 구동 알고리즘
-
-엘리베이터는 SCAN 알고리즘을 통해 이동방향을 우선으로 하여 외부인터럽트를 통해 입력된 요청들을 바탕으로 움직임이 결정된다.
-
-엘리베이터의 요청은 내부, 외부 하강, 외부 상승 버튼을 나누어 세 개의 큐 변수로 관리된다.
-
-엘리베이터 구동 시간을 HAL_GetTick()함수를 이용해 측정하여 시간 별로 요청을 처리하는 로직을 만들어 다음 층에서 멈출지 지나갈지를 결정한다.
-
-요청은 이동중, 정지중을 나누어 다르게 처리한다.
+## 🧪 실시간 동작 로그 (UART 출력 예시)
 
 
-## 실제 엘리베이터 구동 로그 (HUART로 확인)
-
-### 1. 엘리베이터 대기 상태
+### ⚪1. 엘리베이터 대기 상태
 ```
 current floor : [B1] -> next floor : [B1]   CURRENT STATE TO [IDLE]
 State changed to [IDLE] after request processing 
@@ -60,7 +54,7 @@ State changed to [IDLE] after request processing
 NO REQUSESTS. current floor : B1 , current state : IDLE
 ```
 
-### 2. 엘리베이터 요청 발생
+### ⚪2. 엘리베이터 요청 발생
 ```
 Interrupt Triggered! Pushed request 1 to internal
 After push - [1,0,0]
@@ -76,7 +70,7 @@ current floor : [B1] -> next floor : [B1]   CURRENT STATE TO [IDLE]
 No remaining requests...
 ```
 
-### 3. 엘리베이터 이동 중 로그
+### ⚪3. 엘리베이터 이동 중 로그
 ```
 Interrupt Triggered! Pushed request 2 to internal
 After push - [2,0,0]
@@ -108,6 +102,45 @@ NO REQUSESTS. current floor : F1 , current state : IDLE
 current floor : [F1] -> next floor : [F1]   CURRENT STATE TO [IDLE]
 State changed to [IDLE] after request processing 
 ```
+
+
+---
+
+## 📁 디렉토리 구조
+```
+Core/
+├── Inc/                       # 헤더 파일
+│   ├── button.h               # 버튼 처리 로직
+│   ├── elevator.h             # 엘리베이터 알고리즘 정의
+│   ├── gpio.h, main.h         # 시스템 설정
+│   ├── photo.h                # 조도 센서 관련
+│   ├── stepper.h              # 스테퍼 모터 제어
+│   ├── tim.h, usart.h         # 타이머, UART 관련
+│   └── stm32f4xx_it.h, conf.h # 인터럽트 처리
+├── Src/                        # 소스 코드
+│   ├── button.c
+│   ├── elevator.c
+│   ├── gpio.c, main.c
+│   ├── photo.c, stepper.c
+│   ├── stm32f4xx_it.c, msp.c
+│   ├── tim.c, usart.c
+│   └── syscalls.c, system_*.c
+```
+
+>하드웨어별로 헤더와 소스파일을 분리해 기능을 구현했다.
+---
+
+## 🎥 시나리오 1 데모 영상
+
+
+
+
+## ✳️ 주요 기능 요약
+- SCAN 알고리즘과 큐 기반 요청 처리를 이용한 실제 엘리베이터에 가까운 기능 구현
+- 내부/ 외부요청을 분리해 관리
+- 인터럽트를 이용하여 엘리베이터 구동에 방해받지 않고 실시간으로 입력 수용 기능 구현
+- 스테퍼 모터를 이용한 엘리베이터의 기계적 구조 이해 및 요구사항에 맞춘 소프트웨어 제어 구현
+
 
 
 
