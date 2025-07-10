@@ -1,9 +1,11 @@
 # 🔵 STM32 기반 엘리베이터 프로젝트 (Elevator Control System)
 
+## 🧰 기술 스택
 ![STM32](https://img.shields.io/badge/Board-STM32F411RE-blue)
 ![Language](https://img.shields.io/badge/Language-C-informational)
-![UART](https://img.shields.io/badge/Comm-UART-yellow)
 ![Motor](https://img.shields.io/badge/Motor-Stepper-green)
+![SCAN Algorithm](https://img.shields.io/badge/Elevator-algorithm-blue)
+
 
 블로그를 통해 자세한 설명을 확인하세요!!
 
@@ -11,10 +13,17 @@
 
 ## 📌 프로젝트 개요
 
-이 프로젝트는 **STM32F411RE** 보드를 기반으로 실제 엘리베이터 시스템의 동작을 임베디드 환경에서 구현한 것입니다.  
-내부 요청, 외부 상승/하강 요청을 각각 구분하여 SCAN 알고리즘을 적용, 실제 동작 시간과 인터럽트 기반 요청 처리, UART 로그 기록 등을 통해 **현실적인 시뮬레이션 환경**을 조성했습니다.
+이 프로젝트는 **STM32F411RE** 보드를 기반으로 실제 엘리베이터 시스템의 동작을 임베디드 환경에서 구현하는 것을 목표로 함
+내부 요청, 외부 상승/하강 요청을 각각 구분하여 SCAN 알고리즘활용한 엘리베이터 알고리즘을  적용, 실제 동작 시간과 인터럽트 기반 요청 처리, UART 로그 기록 등을 통해 **현실적인 시뮬레이션 환경**을 조성을 해 엘리베이터의 실제 움직임과 로그의 비교를 통해 디버깅을 실시해 효율을 높임
 
 ---
+
+## 플로우 차트
+
+<img width="362" height="527" alt="image" src="https://github.com/user-attachments/assets/e44afc06-98b1-4e37-a6d9-6a561dc84834" />
+
+
+
 
 ## 🛠️ 사용 하드웨어 및 시스템 구성
 
@@ -142,7 +151,6 @@ Core/
 
 ---
 
-
 ## ✳️ 주요 기능 요약
 - SCAN 알고리즘과 큐 기반 요청 처리를 이용한 실제 엘리베이터에 가까운 기능 구현
 - 내부/ 외부요청을 분리해 관리
@@ -151,8 +159,9 @@ Core/
 
 ---
 
-## 🧠트러블 슈팅 및 고찰
-- 단순 버튼 조작을 통한 모터 제어가 아닌 실제 엘리베이터의 구동을 구현하기 위한 알고리즘 작성 및 소프트웨어 코드 구현이 
+## 🧠프로젝트의 주안점 및 고찰
+- 단순 버튼 조작을 통한 모터 제어가 아닌 실제 엘리베이터의 구동을 구현하기 위한 알고리즘 작성 및 소프트웨어 코드의 직접 구현을 목표로 함
+- 프로젝트의 요구사항에 맞추기 위한 스테퍼 모터 제어를 위한 실험적 파라미터 도출
 
 
 
