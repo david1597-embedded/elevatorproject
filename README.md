@@ -4,7 +4,7 @@
 ![STM32](https://img.shields.io/badge/Board-STM32F411RE-blue)
 ![Language](https://img.shields.io/badge/Language-C-informational)
 ![Motor](https://img.shields.io/badge/Motor-Stepper-green)
-![SCAN Algorithm](https://img.shields.io/badge/Elevator-algorithm-blue)
+![Algorithm](https://img.shields.io/badge/SCAN-algorithm-blue)
 
 
 블로그를 통해 자세한 설명을 확인하세요!!
